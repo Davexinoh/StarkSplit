@@ -43,7 +43,7 @@ export default function Navbar({ address, user, onLogin, onLogout, isLoading }) 
             boxShadow:    '0 0 14px rgba(255,100,0,0.45)',
             border:       '1px solid rgba(255,120,0,0.3)',
           }}>
-            <img src="/StarkSplit/logo.svg" alt="StarkSplit" width={34} height={34} style={{ display:'block' }} />
+            <img src="/logo.svg" alt="StarkSplit" width={34} height={34} style={{ display:'block' }} />
           </div>
           <span style={{
             fontFamily:    'var(--font-display)',

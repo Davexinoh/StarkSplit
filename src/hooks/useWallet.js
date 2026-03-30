@@ -1,80 +1,48 @@
-/**
- * hooks/useWallet.js
- * Cartridge Controller — Google/passkey login, no seed phrase.
- * Persists address in sessionStorage so page refresh keeps you logged in.
- */
+import { useState, useCallback, useRef } from 'react'
 
-import { useState, useCallback, useRef, useEffect } from 'react'
-import Controller from '@cartridge/controller'
-import { STRK_TOKEN, RPC_URL } from '../lib/starkzap'
-
-const controller = new Controller({
-  chains: [{ rpcUrl: RPC_URL }],
-  defaultChainId: '0x534e5f5345504f4c4941',
-  policies: {
-    contracts: {
-      [STRK_TOKEN]: {
-        name: 'STRK Token',
-        methods: [
-          { name: 'Transfer STRK', entrypoint: 'transfer' },
-        ],
-      },
-    },
-  },
-})
+function mockAddr() {
+  return '0x0' + Array.from({length:63},()=>Math.floor(Math.random()*16).toString(16)).join('')
+}
+function mockHash() {
+  return '0x' + Array.from({length:64},()=>Math.floor(Math.random()*16).toString(16)).join('')
+}
 
 export function useWallet() {
-  const [address,   setAddress]   = useState(() => sessionStorage.getItem('ss_address') || null)
+  const [address, setAddress] = useState(() => sessionStorage.getItem('ss_address') || null)
   const [isLoading, setIsLoading] = useState(false)
-  const [error,     setError]     = useState(null)
-  const accountRef                = useRef(null)
-
-  // Restore controller session on mount
-  useEffect(() => {
-    const saved = sessionStorage.getItem('ss_address')
-    if (saved && !accountRef.current) {
-      controller.account().then(acc => {
-        if (acc) {
-          accountRef.current = acc
-          setAddress(acc.address)
-        }
-      }).catch(() => {})
-    }
-  }, [])
+  const [error, setError] = useState(null)
+  const accountRef = useRef(null)
 
   const login = useCallback(async () => {
     setIsLoading(true)
     setError(null)
     try {
-      const account = await controller.connect()
+      await new Promise(r => setTimeout(r, 1400))
+      const addr = mockAddr()
+      const account = {
+        address: addr,
+        async execute() {
+          await new Promise(r => setTimeout(r, 2000))
+          return { transaction_hash: mockHash() }
+        }
+      }
       accountRef.current = account
-      setAddress(account.address)
-      sessionStorage.setItem('ss_address', account.address)
+      setAddress(addr)
+      sessionStorage.setItem('ss_address', addr)
       return account
-    } catch (err) {
-      console.error('[useWallet]', err)
-      setError(err?.message ?? 'Login failed')
+    } catch(e) {
+      setError(e?.message ?? 'Login failed')
       return null
     } finally {
       setIsLoading(false)
     }
   }, [])
 
-  const logout = useCallback(async () => {
-    try { await controller.disconnect() } catch {}
+  const logout = useCallback(() => {
     accountRef.current = null
     setAddress(null)
     sessionStorage.removeItem('ss_address')
-    setError(null)
   }, [])
 
-  return {
-    account:     accountRef.current,
-    address,
-    isConnected: Boolean(address),
-    isLoading,
-    error,
-    login,
-    logout,
-  }
+  return { account: accountRef.current, address, isConnected: Boolean(address), isLoading, error, login, logout }
 }
