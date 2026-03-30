@@ -175,7 +175,7 @@ export default function CreateSplitPage({ user }) {
           <label className="label">Bill name</label>
           <input
             className="input"
-            placeholder="e.g. Dinner at Mama's"
+              placeholder="e.g. Dinner, Groceries, Trip"
             value={title}
             onChange={e => setTitle(e.target.value)}
             maxLength={60}
