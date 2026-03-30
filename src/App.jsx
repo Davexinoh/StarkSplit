@@ -26,7 +26,7 @@ function Protected({ children, address, user }) {
 }
 
 export default function App() {
-  const { account, address, isConnected, login, logout, isLoading: walletLoading, error: walletError } = useWallet()
+  const { account, address, balance, isConnected, login, logout, isLoading: walletLoading, error: walletError } = useWallet()
   const { user, hasProfile, isLoading: authLoading, error: authError, register } = useAuth(address)
   const navigate = useNavigate()
 
@@ -84,7 +84,7 @@ export default function App() {
 
         <Route path="/dashboard" element={
           <Protected address={address} user={user}>
-            <DashboardPage user={user} />
+            <DashboardPage user={user} balance={balance} />
           </Protected>
         }/>
 
@@ -123,4 +123,4 @@ export default function App() {
       <Footer />
     </>
   )
-}
+          }
