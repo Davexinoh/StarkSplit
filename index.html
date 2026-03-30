@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>StarkSplit — Split bills. Settle in STRK.</title>
+    <meta name="description" content="Split expenses with anyone, anywhere. No bank. No fees. Just Google login and STRK." />
+    <meta property="og:title" content="StarkSplit — Split bills. Settle in STRK." />
+    <meta property="og:description" content="Split expenses with anyone, anywhere. No wallet needed." />
+    <link rel="icon" type="image/svg+xml" href="/StarkSplit/logo.svg" />
+    <!-- GitHub Pages SPA routing -->
+    <script>
+      (function() {
+        var p = window.location.search.match(/[?&]p=([^&]+)/);
+        if (p) {
+          var d = decodeURIComponent(p[1]);
+          window.history.replaceState(null, null,
+            window.location.pathname.slice(0, -1) + '/' + d);
+        }
+      })();
+    </script>
+    <!-- Syne: bold display | General Sans: refined body -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
