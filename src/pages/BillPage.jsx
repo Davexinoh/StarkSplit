@@ -11,7 +11,7 @@ import { getBill, getSplitByBillAndUsername, markSplitPaid } from '../lib/supaba
 import { fmtSTRK, EXPLORER } from '../lib/starkzap'
 import { fmtDate, sum, copyToClipboard } from '../lib/utils'
 import { useTransfer } from '../hooks/useTransfer'
-// import Confetti from './Confetti'
+import Confetti from './Confetti'
 
 const APP_URL = import.meta.env.VITE_APP_URL || window.location.origin
 
@@ -63,7 +63,7 @@ function SplitRow({ split }) {
 }
 
 /* ── Confetti burst ──────────────────────────────────────── */
-function ConfettiBurst({ active }) {
+function Confetti({ active }) {
   const COLORS = ['#FF4D00','#FF8C00','#FFB800','#34d399','#fff','#c084fc']
   if (!active) return null
   return (
@@ -88,7 +88,7 @@ function ConfettiBurst({ active }) {
 export default function BillPage({ user, account, onLogin, isLoading: walletLoading }) {
   const { id }       = useParams()
   const navigate     = useNavigate()
-  const { send, isLoading: sending, error: sendError } = useTransfer()
+  const { send, isLoading: sending, error: sendError } = useTransfer(onDeduct)
 
   const [bill,     setBill]     = useState(null)
   const [loading,  setLoading]  = useState(true)
@@ -164,7 +164,7 @@ export default function BillPage({ user, account, onLogin, isLoading: walletLoad
 
   return (
     <>
-      <ConfettiBurst active={confetti} />
+      <Confetti active={confetti} />
       <div className="page" style={{ padding:'40px 0 80px' }}>
         <div className="container">
 
@@ -350,4 +350,5 @@ export default function BillPage({ user, account, onLogin, isLoading: walletLoad
       </div>
     </>
   )
-}
+                                }
+                         
