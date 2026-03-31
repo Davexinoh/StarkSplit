@@ -11,7 +11,6 @@ import { getBill, getSplitByBillAndUsername, markSplitPaid } from '../lib/supaba
 import { fmtSTRK, EXPLORER } from '../lib/starkzap'
 import { fmtDate, sum, copyToClipboard } from '../lib/utils'
 import { useTransfer } from '../hooks/useTransfer'
-import Confetti from './Confetti'
 
 const APP_URL = import.meta.env.VITE_APP_URL || window.location.origin
 
