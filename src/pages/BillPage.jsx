@@ -63,7 +63,7 @@ function SplitRow({ split }) {
 }
 
 /* ── Confetti burst ──────────────────────────────────────── */
-function Confetti({ active }) {
+function ConfettiBurst({ active }) {
   const COLORS = ['#FF4D00','#FF8C00','#FFB800','#34d399','#fff','#c084fc']
   if (!active) return null
   return (
@@ -164,7 +164,7 @@ export default function BillPage({ user, account, onLogin, isLoading: walletLoad
 
   return (
     <>
-      <Confetti active={confetti} />
+      <ConfettiBurst active={confetti} />
       <div className="page" style={{ padding:'40px 0 80px' }}>
         <div className="container">
 
