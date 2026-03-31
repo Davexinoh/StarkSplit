@@ -11,6 +11,7 @@ import { getBill, getSplitByBillAndUsername, markSplitPaid } from '../lib/supaba
 import { fmtSTRK, EXPLORER } from '../lib/starkzap'
 import { fmtDate, sum, copyToClipboard } from '../lib/utils'
 import { useTransfer } from '../hooks/useTransfer'
+import Confetti from './Confetti'
 
 const APP_URL = import.meta.env.VITE_APP_URL || window.location.origin
 
@@ -62,7 +63,7 @@ function SplitRow({ split }) {
 }
 
 /* ── Confetti burst ──────────────────────────────────────── */
-function ConfettiBurst({ active }) {
+function Confetti({ active }) {
   const COLORS = ['#FF4D00','#FF8C00','#FFB800','#34d399','#fff','#c084fc']
   if (!active) return null
   return (
@@ -84,10 +85,10 @@ function ConfettiBurst({ active }) {
 }
 
 /* ── Main ────────────────────────────────────────────────── */
-export default function BillPage({ user, account, onLogin, isLoading: walletLoading }) {
+export default function BillPage({ user, account, onLogin, isLoading: walletLoading, onDeduct, onAdd }) {
   const { id }       = useParams()
   const navigate     = useNavigate()
-  const { send, isLoading: sending, error: sendError } = useTransfer(onDeduct)
+  const { send, isLoading: sending, error: sendError } = useTransfer(onDeduct, onAdd)
 
   const [bill,     setBill]     = useState(null)
   const [loading,  setLoading]  = useState(true)
@@ -124,7 +125,7 @@ export default function BillPage({ user, account, onLogin, isLoading: walletLoad
     // Replace with: await getUserByUsername(bill.creator_username) → wallet_address
     const TO = '0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7'
 
-    const hash = await send({ account, to: TO, amount: mySplit.amount })
+    const hash = await send({ account, to: TO, amount: mySplit.amount, toUsername: bill.creator_username })
     if (!hash) return
 
     await markSplitPaid({ splitId: mySplit.id, txHash: hash })
@@ -163,7 +164,7 @@ export default function BillPage({ user, account, onLogin, isLoading: walletLoad
 
   return (
     <>
-      <ConfettiBurst active={confetti} />
+      <Confetti active={confetti} />
       <div className="page" style={{ padding:'40px 0 80px' }}>
         <div className="container">
 
@@ -349,5 +350,5 @@ export default function BillPage({ user, account, onLogin, isLoading: walletLoad
       </div>
     </>
   )
-                                }
-                         
+    }
+                             
