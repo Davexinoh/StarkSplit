@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom'
 import { shortAddr } from '../lib/starkzap'
 import { initials } from '../lib/utils'
 
-export default function Navbar({ address, user, onLogin, onLogout, isLoading }) {
+export default function Navbar({ address, user, isLoggedIn, onLogin, onLogout, isLoading }) {
   const { pathname } = useLocation()
   const [menuOpen, setMenuOpen] = useState(false)
   const isLanding = pathname === '/' || pathname === ''
@@ -73,7 +73,7 @@ export default function Navbar({ address, user, onLogin, onLogout, isLoading }) 
           </Link>
 
           {/* ── Desktop nav links ── */}
-          {address && user && (
+          {isLoggedIn && user && (
             <div style={{ display:'flex', gap:2, flex:1, justifyContent:'center' }}>
               {navLinks.map(({ to, label }) => (
                 <Link key={to} to={to} style={{
@@ -97,7 +97,7 @@ export default function Navbar({ address, user, onLogin, onLogout, isLoading }) 
 
           {/* ── Right ── */}
           <div style={{ display:'flex', alignItems:'center', gap:6, flexShrink:0 }}>
-            {address ? (
+            {isLoggedIn ? (
               <>
                 {user && (
                   <div style={{
@@ -116,7 +116,7 @@ export default function Navbar({ address, user, onLogin, onLogout, isLoading }) 
                   </div>
                 )}
                 {/* Mobile menu toggle */}
-                {address && user && (
+                {isLoggedIn && user && (
                   <button
                     onClick={() => setMenuOpen(o => !o)}
                     style={{ background:'var(--bg-raised)', border:'1px solid var(--border-2)', borderRadius:'var(--r-sm)', padding:'6px 8px', color:'var(--text-300)', fontSize:'1rem', display:'flex', alignItems:'center', cursor:'pointer' }}
@@ -138,7 +138,7 @@ export default function Navbar({ address, user, onLogin, onLogout, isLoading }) 
       </nav>
 
       {/* ── Mobile dropdown menu ── */}
-      {menuOpen && address && user && (
+      {menuOpen && isLoggedIn && user && (
         <div style={{
           position:   'fixed',
           top:        60,
@@ -179,4 +179,4 @@ export default function Navbar({ address, user, onLogin, onLogout, isLoading }) 
       )}
     </>
   )
-      }
+}
