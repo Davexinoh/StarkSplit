@@ -22,7 +22,7 @@ export default function App() {
     isLoading, error, register, login, logout, clearError,
   } = useAuth()
 
-  const { account, address, balance, deductBalance } = useWallet(user)
+  const { account, address, balance, deductBalance, addBalance } = useWallet(user)
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -85,13 +85,13 @@ export default function App() {
             account={account}
             onLogin={goToAuth}
             isLoading={isLoading}
-            onDeduct={deductBalance}
+            onDeduct={deductBalance} onAdd={addBalance}
           />
         }/>
 
         <Route path="/send" element={
           <Protected isLoggedIn={isLoggedIn} hasProfile={hasProfile}>
-            <SendPage user={user} account={account} onDeduct={deductBalance} />
+            <SendPage user={user} account={account} onDeduct={deductBalance} onAdd={addBalance} />
           </Protected>
         }/>
 
