@@ -10,7 +10,7 @@ import { getUserByUsername } from '../lib/supabase'
 import { fmtSTRK, EXPLORER } from '../lib/starkzap'
 import { useTransfer } from '../hooks/useTransfer'
 
-export default function SendPage({ user, account }) {
+export default function SendPage({ user, account, onDeduct }) {
   const navigate = useNavigate()
   const { send, txHash, isLoading, isSuccess, error, reset } = useTransfer(onDeduct)
 
