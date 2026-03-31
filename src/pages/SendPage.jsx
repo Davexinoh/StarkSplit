@@ -12,7 +12,7 @@ import { useTransfer } from '../hooks/useTransfer'
 
 export default function SendPage({ user, account }) {
   const navigate = useNavigate()
-  const { send, txHash, isLoading, isSuccess, error, reset } = useTransfer()
+  const { send, txHash, isLoading, isSuccess, error, reset } = useTransfer(onDeduct)
 
   const [recipient, setRecipient] = useState('')
   const [amount,    setAmount]    = useState('')
@@ -253,4 +253,5 @@ export default function SendPage({ user, account }) {
       </div>
     </div>
   )
-}
+            }
+            
