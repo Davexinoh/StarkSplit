@@ -1,95 +1,80 @@
-/**
- * App.jsx
- * Root component.
- * Owns wallet + auth state, passes down to all pages.
- * Routes: / | /auth | /dashboard | /create | /bill/:id | /send
- */
-
 import React, { useEffect } from 'react'
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom'
-import Navbar        from './components/Navbar'
-import Footer        from './components/Footer'
-import LandingPage   from './pages/LandingPage'
-import AuthPage      from './pages/AuthPage'
-import DashboardPage from './pages/DashboardPage'
+import Navbar          from './components/Navbar'
+import Footer          from './components/Footer'
+import LandingPage     from './pages/LandingPage'
+import AuthPage        from './pages/AuthPage'
+import DashboardPage   from './pages/DashboardPage'
 import CreateSplitPage from './pages/CreateSplitPage'
-import BillPage      from './pages/BillPage'
-import SendPage      from './pages/SendPage'
-import { useWallet } from './hooks/useWallet'
-import { useAuth   } from './hooks/useAuth'
+import BillPage        from './pages/BillPage'
+import SendPage        from './pages/SendPage'
+import { useAuth }     from './hooks/useAuth'
+import { useWallet }   from './hooks/useWallet'
 
-/* ── Protected route ─────────────────────────────────────── */
-function Protected({ children, address, user }) {
-  if (!address) return <Navigate to="/auth" replace />
-  if (!user)    return <Navigate to="/auth" replace />
+function Protected({ children, isLoggedIn, hasProfile }) {
+  if (!isLoggedIn || !hasProfile) return <Navigate to="/auth" replace />
   return children
 }
 
 export default function App() {
-  const { account, address, balance, isConnected, login, logout, isLoading: walletLoading, error: walletError } = useWallet()
-  const { user, hasProfile, isLoading: authLoading, error: authError, register } = useAuth(address)
+  const {
+    session, user, isLoggedIn, hasProfile,
+    isLoading, error, register, login, logout, clearError,
+  } = useAuth()
+
+  const { account, address, balance, deductBalance } = useWallet(user)
   const navigate = useNavigate()
 
-  // Auto-redirect after login + profile setup
   useEffect(() => {
-    if (isConnected && hasProfile) {
-      const path = window.location.hash.replace('#','')
-      if (path === '/auth' || path === '' || path === '/') {
-        navigate('/dashboard')
-      }
+    if (isLoggedIn && hasProfile) {
+      const hash = window.location.hash.replace('#','')
+      if (!hash || hash === '/' || hash === '/auth') navigate('/dashboard')
     }
-  }, [isConnected, hasProfile])
+  }, [isLoggedIn, hasProfile])
 
-  // Handle login button from landing
-  const handleLogin = async () => {
-    const acc = await login()
-    if (acc) navigate('/auth')
-  }
+  const goToAuth = () => navigate('/auth')
 
   return (
     <>
-      {/* ── Animated ambient background ── */}
       <div className="mesh-bg" aria-hidden="true"/>
-      <div className="grid-bg" aria-hidden="true"/>
+      <div className="grid-bg"  aria-hidden="true"/>
 
-      {/* ── Navigation ── */}
       <Navbar
-        address={address}
         user={user}
-        onLogin={handleLogin}
+        address={address}
+        isLoggedIn={isLoggedIn}
+        onLogin={goToAuth}
         onLogout={logout}
-        isLoading={walletLoading}
+        isLoading={isLoading}
       />
 
-      {/* ── Routes ── */}
       <Routes>
         <Route path="/" element={
-          isConnected && hasProfile
+          isLoggedIn && hasProfile
             ? <Navigate to="/dashboard" replace />
-            : <LandingPage onLogin={handleLogin} isLoading={walletLoading} />
+            : <LandingPage onLogin={goToAuth} isLoading={isLoading} />
         }/>
 
         <Route path="/auth" element={
           <AuthPage
-            address={address}
-            user={user}
-            onLogin={handleLogin}
-            isLoading={walletLoading}
-            walletError={walletError}
+            isLoggedIn={isLoggedIn}
+            hasProfile={hasProfile}
+            isLoading={isLoading}
+            error={error}
             onRegister={register}
-            authLoading={authLoading}
-            authError={authError}
+            onLogin={login}
+            onClearError={clearError}
           />
         }/>
 
         <Route path="/dashboard" element={
-          <Protected address={address} user={user}>
+          <Protected isLoggedIn={isLoggedIn} hasProfile={hasProfile}>
             <DashboardPage user={user} balance={balance} />
           </Protected>
         }/>
 
         <Route path="/create" element={
-          <Protected address={address} user={user}>
+          <Protected isLoggedIn={isLoggedIn} hasProfile={hasProfile}>
             <CreateSplitPage user={user} />
           </Protected>
         }/>
@@ -98,20 +83,21 @@ export default function App() {
           <BillPage
             user={user}
             account={account}
-            onLogin={handleLogin}
-            isLoading={walletLoading}
+            onLogin={goToAuth}
+            isLoading={isLoading}
+            onDeduct={deductBalance}
           />
         }/>
 
         <Route path="/send" element={
-          <Protected address={address} user={user}>
-            <SendPage user={user} account={account} />
+          <Protected isLoggedIn={isLoggedIn} hasProfile={hasProfile}>
+            <SendPage user={user} account={account} onDeduct={deductBalance} />
           </Protected>
         }/>
 
         <Route path="*" element={
-          <div style={{ minHeight:'80vh', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:16, textAlign:'center' }}>
-            <h2 style={{ fontSize:'1.5rem' }}>404 — Page not found</h2>
+          <div style={{ minHeight:'80vh', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:16, textAlign:'center', zIndex:1, position:'relative' }}>
+            <h2 style={{ fontSize:'1.5rem' }}>404 — Not found</h2>
             <button className="btn btn-primary" onClick={() => navigate('/')} style={{ padding:'12px 28px' }}>
               Go home
             </button>
@@ -119,8 +105,7 @@ export default function App() {
         }/>
       </Routes>
 
-      {/* ── Footer ── */}
       <Footer />
     </>
   )
-          }
+}
