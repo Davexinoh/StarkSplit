@@ -10,9 +10,9 @@ import { getUserByUsername } from '../lib/supabase'
 import { fmtSTRK, EXPLORER } from '../lib/starkzap'
 import { useTransfer } from '../hooks/useTransfer'
 
-export default function SendPage({ user, account, onDeduct }) {
+export default function SendPage({ user, account }) {
   const navigate = useNavigate()
-  const { send, txHash, isLoading, isSuccess, error, reset } = useTransfer(onDeduct)
+  const { send, txHash, isLoading, isSuccess, error, reset } = useTransfer(onDeduct, onAdd)
 
   const [recipient, setRecipient] = useState('')
   const [amount,    setAmount]    = useState('')
@@ -48,7 +48,7 @@ export default function SendPage({ user, account, onDeduct }) {
 
   const handleSend = async () => {
     if (!resolved?.address || !amount) return
-    await send({ account, to: resolved.address, amount })
+    await send({ account, to: resolved.address, amount, toUsername: resolved.username })
   }
 
   /* ── Success state ── */
@@ -253,5 +253,5 @@ export default function SendPage({ user, account, onDeduct }) {
       </div>
     </div>
   )
-            }
-            
+          }
+  
