@@ -5,13 +5,17 @@ function mockHash() {
   return '0x' + Array.from({length:64},()=>Math.floor(Math.random()*16).toString(16)).join('')
 }
 
-export function useTransfer(onDeduct) {
+export function useTransfer(onDeduct, onAdd) {
   const [txHash,    setTxHash]    = useState(null)
   const [isLoading, setIsLoading] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
   const [error,     setError]     = useState(null)
 
-  const send = useCallback(async ({ account, to, amount }) => {
+  /**
+   * send({ account, to, amount, toUsername? })
+   * toUsername — if provided, credits their Supabase balance
+   */
+  const send = useCallback(async ({ account, to, amount, toUsername }) => {
     if (!account) { setError('Wallet not connected'); return null }
     if (!to)      { setError('Missing recipient');    return null }
     if (!amount)  { setError('Missing amount');       return null }
@@ -22,7 +26,6 @@ export function useTransfer(onDeduct) {
     setTxHash(null)
 
     try {
-      // Execute mock transfer
       const result = await account.execute([{
         contractAddress: STRK_TOKEN,
         entrypoint:      'transfer',
@@ -33,8 +36,11 @@ export function useTransfer(onDeduct) {
       setTxHash(hash)
       setIsSuccess(true)
 
-      // Deduct balance immediately after success
-      if (onDeduct) onDeduct(parseFloat(amount))
+      // Deduct from sender
+      if (onDeduct) await onDeduct(parseFloat(amount))
+
+      // Credit recipient if username known
+      if (onAdd && toUsername) await onAdd(toUsername, parseFloat(amount))
 
       return hash
     } catch (err) {
@@ -44,7 +50,7 @@ export function useTransfer(onDeduct) {
     } finally {
       setIsLoading(false)
     }
-  }, [onDeduct])
+  }, [onDeduct, onAdd])
 
   const reset = useCallback(() => {
     setTxHash(null)
@@ -54,4 +60,4 @@ export function useTransfer(onDeduct) {
   }, [])
 
   return { send, txHash, isLoading, isSuccess, error, reset }
-}
+      }
